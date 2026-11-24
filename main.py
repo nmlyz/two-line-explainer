@@ -42,6 +42,13 @@ def main():
     with open(path, "w", encoding="utf-8", newline="") as f:
         f.write(text)
     os.chmod(path, 0o644)
+    # Read it back and verify the bytes on disk are exactly what was checked.
+    with open(path, "rb") as f:
+        written = f.read()
+    if written != text.encode("utf-8"):
+        raise ValueError("entry.txt on disk differs from the checked text")
+    if os.stat(path).st_mode & 0o777 != 0o644:
+        raise ValueError("entry.txt must be readable by every user (0644)")
     print(f"wrote {len(text)} characters to {path}")
 
 
